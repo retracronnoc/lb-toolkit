@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Toolkit for Liquid Budget — Settings</title>
+  <style>
+    body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; padding: 20px; max-width: 460px; color: #222; }
+    h1 { font-size: 16px; margin-bottom: 12px; }
+    h2 { font-size: 13px; margin: 22px 0 8px; text-transform: uppercase; letter-spacing: .04em; color: #555; }
+    label { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; }
+    .hint { color: #777; font-size: 11px; margin: 0 0 16px 24px; }
+    .hint.block { margin-left: 0; }
+    .row { display: flex; gap: 8px; }
+    input[type=password], input[type=text] { flex: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; font: inherit; font-size: 13px; }
+    select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; font: inherit; font-size: 13px; }
+    button { padding: 6px 12px; border: 1px solid #bbb; border-radius: 6px; background: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+    button.link { border: none; background: none; color: #1d4ed8; padding: 0; }
+    #status { font-size: 12px; color: #1e8449; height: 16px; }
+    #tokenStatus { font-size: 12px; margin-top: 6px; min-height: 16px; }
+    .ok { color: #1e8449; } .err { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <h1>Toolkit for Liquid Budget</h1>
+
+  <h2>Transactions</h2>
+  <label><input type="checkbox" data-setting="thickMonthDividers" /> Thicker divider between months</label>
+  <p class="hint">Adds a 4px border where the transaction list crosses a month boundary (e.g. Jan 31 → Feb 1).</p>
+
+  <h2>Left menu</h2>
+  <label><input type="checkbox" data-setting="compactMenu" /> Compact left menu</label>
+  <p class="hint">Tightens the rows from Budget to Recurring Transactions (32px rows, 2px apart instead of 36px and 4px).</p>
+  <label><input type="checkbox" data-setting="highlightErrors" /> Highlight budget errors</label>
+  <p class="hint">Gives error bars above the budget (Budget Overdraft and others) a light red band, a red edge and larger text.</p>
+  <label><input type="checkbox" data-setting="hideNetWorth" /> Hide Net Worth</label>
+  <p class="hint">Hides the Net Worth card at the bottom of the left sidebar.</p>
+  <label><input type="checkbox" data-setting="hideCurrency" /> Hide currency symbol</label>
+  <p class="hint">Shows amounts without the $ (or your budget's currency symbol) everywhere in Liquid Budget.</p>
+
+  <h2>Budget screen</h2>
+  <label><input type="checkbox" data-setting="availIncludesUpcoming" /> Available includes upcoming transactions</label>
+  <p class="hint">For the current month, each bucket's Available has transactions dated later this month taken out, with a calendar-clock icon listing them. You can also switch this with the calendar-clock button next to the AVAILABLE column header.</p>
+
+  <label><input type="checkbox" data-setting="futureAssigned" /> Future months in All Money Assigned</label>
+  <p class="hint">Adds a line per coming month (up to 12 ahead) that already has money assigned, with that month's total, under All Money Assigned.</p>
+
+  <label><input type="checkbox" data-setting="reportsIncludeAll" /> Reports: include all transactions</label>
+  <p class="hint">On Reports → Overview for the current month, extends the Inflow and Outflow bars with a lighter, striped segment for transactions dated later this month (scheduled and pending), and updates Monthly net and Liquid budget to match.</p>
+
+  <label><input type="checkbox" data-setting="cashFlowTab" /> Reports: Cash Flow tab</label>
+  <p class="hint">Adds a Cash Flow tab after Income vs Expense: a Sankey chart of the month from income sources through your budget to categories and buckets, with pending and scheduled amounts striped.</p>
+
+  <h2>Days of Buffer</h2>
+  <label><input type="checkbox" data-setting="bufferWidget" /> Show Days of Buffer on the budget screen</label>
+  <p class="hint">A widget above All Money Assigned: how many days your account group's balance would last at the last 90 days' spending.</p>
+  <label for="bufferGroup">Account group to count</label>
+  <div class="row"><input id="bufferGroup" type="text" data-text-setting="bufferGroup" placeholder="Liquid" /></div>
+  <p class="hint block">The group's name exactly as it appears in the left sidebar (for example, Liquid).</p>
+  <label for="bufferDays">Spending to average</label>
+  <div class="row"><select id="bufferDays" data-number-setting="bufferDays"><option value="90">Last 90 days</option><option value="180">Last 180 days</option><option value="360">Last 360 days</option></select></div>
+  <p class="hint block">Also changeable from the cog on the widget.</p>
+  <label><input type="checkbox" data-setting="bufferIncludeCards" /> Subtract credit card balances</label>
+  <p class="hint">Takes what you owe on credit cards off the balance before dividing (also in the widget's cog menu).</p>
+  <label for="bufferCardsGroup">Credit card account group</label>
+  <div class="row"><input id="bufferCardsGroup" type="text" data-text-setting="bufferCardsGroup" placeholder="Credit Cards" /></div>
+
+  <h2>Retirement Horizon</h2>
+  <label><input type="checkbox" data-setting="retireWidget" /> Show Retirement Horizon on the budget screen</label>
+  <p class="hint">A widget below Days of Buffer: how close your invested money is to financial independence. It works out your FI number (a year of spending ÷ your withdrawal rate, 25× at 4%), what a safe withdrawal pays a month and a year, and how many years until you get there with your current saving and a yearly growth rate after inflation. The withdrawal rate, growth, savings outside the budget, which account groups count and which categories count as spending are all set from the widget's cog.</p>
+
+  <h2>Pacing</h2>
+  <label><input type="checkbox" data-setting="forecastMenu" /> Show Pacing in the left menu</label>
+  <p class="hint">Adds a Pacing page under Projections: how the current month is going, counting every transaction dated this month (pending and scheduled ones included), which buckets are projected to run out of money, and quick assign amounts that are out of step with what you actually spend.</p>
+
+  <label for="lbToken" style="margin-top:14px">Liquid Budget API token</label>
+  <div class="row">
+    <input id="lbToken" type="password" autocomplete="off" spellcheck="false" placeholder="lbro_…" />
+    <button id="saveToken">Save &amp; test</button>
+  </div>
+  <div id="tokenStatus"></div>
+  <p class="hint block">Pacing reads your budget through Liquid Budget's Developer API. Create a <b>read-only</b> token (<code>lbro_</code>) under Developer → API Tokens. The token stays in this browser's extension storage and is only sent to liquidbudget.com.
+    <button id="showToken" class="link">Show</button></p>
+
+  <div id="status"></div>
+  <script src="options.js"></script>
+</body>
+</html>

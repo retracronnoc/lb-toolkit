@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Toolkit for Liquid Budget (Unofficial)",
+  "version": "0.14.1",
+  "description": "Unofficial add-ons for Liquid Budget: a Pacing page, Days of Buffer, Retirement Horizon, upcoming-aware Available and more.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.liquidbudget.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Toolkit for Liquid Budget",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.liquidbudget.com/*"
+      ],
+      "js": [
+        "lib/forecast-math.js",
+        "lib/pacing-math.js",
+        "lib/cashflow-math.js",
+        "lib/quickassign-math.js",
+        "lib/retire-math.js",
+        "currency-ui.js",
+        "pacing-ui.js",
+        "buffer-ui.js",
+        "retire-ui.js",
+        "avail-ui.js",
+        "future-ui.js",
+        "reports-ui.js",
+        "sankey-ui.js",
+        "sidebar-ui.js",
+        "content.js"
+      ],
+      "css": [
+        "pacing.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "short_name": "LB Toolkit"
+}
