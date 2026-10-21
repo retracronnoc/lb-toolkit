@@ -4,8 +4,6 @@ A Chrome extension that adds extra pages, widgets and tweaks to the [Liquid Budg
 
 > **Unofficial.** This project is not made, endorsed or supported by Liquid Budget. It only reads your data. It never changes your budget, and it only talks to liquidbudget.com.
 
-![Pacing page](docs/screenshot-pacing.png)
-
 ALL SCREENSHOTS -> https://drive.google.com/drive/u/0/folders/1m69s8cT-dGbzdebYrvtFNxId0ntqKEhv
 
 ## Features
