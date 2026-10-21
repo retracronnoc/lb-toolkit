@@ -107,13 +107,6 @@ node --test tests/*.test.js
 
 The content scripts work on top of Liquid Budget's own markup. They add elements and data attributes rather than changing the app's React state. If the app's markup changes, a feature may quietly stop showing until it's updated.
 
-### Packaging for the Chrome Web Store
-
-Zip the folder contents (not the folder), leaving out tests and docs:
-
-```bash
-zip -r toolkit-for-liquid-budget.zip . -x 'tests/*' -x 'docs/*' -x '.git/*' -x '*.DS_Store' -x 'README.md'
-```
 
 ## Disclaimer
 
