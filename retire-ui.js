@@ -1,7 +1,7 @@
 /**
  * Toolkit for Liquid Budget — "Retirement Horizon" widget on the budget screen.
  *
- * A right-panel widget (below Days of Buffer, above All Money Assigned): how
+ * A right-panel widget (below All Money Assigned and Days of Buffer): how
  * close the money you have is to financial independence (FI).
  * - Invested: today's balance of the account groups you count (by default
  *   every group except homes and vehicles; what's owed on credit cards in a
@@ -149,6 +149,50 @@
     return `${y < 10 ? y.toFixed(1) : Math.round(y)} yrs · ${when}`;
   }
 
+  // "8 yrs, 4 mos, 12 days": calendar years, months and days from today.
+  function spanText(days) {
+    const start = new Date();
+    start.setHours(12, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + days);
+    let y = end.getFullYear() - start.getFullYear();
+    let m = end.getMonth() - start.getMonth();
+    let d = end.getDate() - start.getDate();
+    if (d < 0) {
+      m -= 1;
+      d += new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+    }
+    if (m < 0) {
+      y -= 1;
+      m += 12;
+    }
+    const part = (n, w) => (n ? `${n} ${w}${n === 1 ? '' : 's'}` : null);
+    return [part(y, 'yr'), part(m, 'mo'), part(d, 'day')].filter(Boolean).join(', ') || '0 days';
+  }
+  const untilText = (days) => {
+    const end = new Date();
+    end.setDate(end.getDate() + days);
+    return end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  function runwaySection(c) {
+    const rw = R.runway({ invested: c.invested, spending: c.flows.spending, growth: c.hz.growth });
+    if (rw.days == null) return null;
+    const growthPct = num(c.hz.growth * 100);
+    const grown = rw.grownYears == null
+      ? 'Indefinitely'
+      : rw.grownYears > 100 ? '100+ yrs' : spanText(Math.floor(rw.grownYears * 365.25));
+    return h('div', { class: 'mt-2 pt-2 border-t px-2 pb-1', title: `${fmt(c.invested)} invested ÷ ${fmt(c.flows.spending)} a year of spending (the categories you count), starting today.` },
+      h('p', { class: 'text-center text-xs font-medium text-muted-foreground' }, 'If you stop working, your money will last'),
+      h('div', { class: 'flow-root mt-1' },
+        line('With no growth', rw.days > 365.25 * 100 ? '100+ yrs' : spanText(rw.days), `${rw.days.toLocaleString('en-US')} days, until ${untilText(rw.days)}, at ${fmt(c.flows.monthlySpending)} a month with nothing earned on what's left`),
+        Math.abs(c.hz.growth) > 1e-9
+          ? line(`With ${growthPct}% growth`, grown, rw.grownYears == null ? `${growthPct}% growth on ${fmt(c.invested)} is more than a year of spending, so it never runs out` : `What's left keeps growing at ${growthPct}% a year after inflation while you spend ${fmt(c.flows.spending)} a year`)
+          : null,
+      ),
+    );
+  }
+
   // ---------- render ----------
 
   function line(label, value, title) {
@@ -197,6 +241,7 @@
         line('FI in', yearsText(hz.years), `At ${num(hz.growth * 100)}% growth after inflation, saving ${fmt(c.saving)} a year`),
         reached ? null : line('Coasting', yearsText(hz.coastYears), 'Growth alone, with no more saving'),
       ),
+      runwaySection(c),
     );
   }
   const monthLabel = (ym) => new Date(`${ym}-15T12:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -370,10 +415,35 @@
     return card && card.parentElement ? card.parentElement : null;
   }
 
+  // Where the Toolkit widgets go in the right panel: just below the panel's
+  // header and any cards the app puts first: All Money Assigned, Budget
+  // Errors, or a selected bucket's Bucket Warning. That way errors and
+  // warnings stay at the top.
+  function topCard() {
+    const ama = assignedWrapper();
+    // The right panel: All Money Assigned's parent, or (while a bucket is
+    // selected and that card is gone) wherever the Toolkit widgets already are.
+    const own = document.getElementById('lbt-buffer-widget') || document.getElementById('lbt-retire-widget');
+    const panel = ama ? ama.parentElement : own ? own.parentElement : null;
+    if (!panel) return null;
+    let anchor = null;
+    for (const c of panel.children) {
+      if (c.id && c.id.startsWith('lbt-')) continue;
+      const header = !anchor && c.matches('div.flex.items-center.justify-between'); // "My Budget" / the bucket's name
+      const alert = c.matches('div.overflow-hidden.rounded-lg.border') &&
+        (/\bborder-(warning|destructive)/.test(String(c.className)) || /^(budget errors|bucket warning)/i.test(c.textContent.trim()));
+      if (header || c === ama || alert) anchor = c;
+      else break; // only the cards at the very top
+    }
+    return anchor || ama;
+  }
+
+
+
   function sync() {
     const existing = document.getElementById(WIDGET_ID);
     const id = budgetIdFromPath();
-    const wrapper = cfg.retireWidget && id ? assignedWrapper() : null;
+    const wrapper = cfg.retireWidget && id ? topCard() : null;
     if (!wrapper) {
       if (existing && (!cfg.retireWidget || !id)) {
         existing.remove();
@@ -391,11 +461,14 @@
     if (!state.loading && (!state.fetchedAt || Date.now() - state.fetchedAt > MAX_AGE_MS)) load();
     const cur = globalThis.LBTCurrency;
     const sig = [id, open, JSON.stringify(cfg), state.fetchedAt, F.localToday(), state.error, cur ? cur.strip('$1') : ''].join('|');
-    const placed = existing && existing.nextElementSibling === wrapper;
+    // Below All Money Assigned (or Budget Errors), after Days of Buffer when that's showing.
+    const buffer = document.getElementById('lbt-buffer-widget');
+    const anchor = buffer && buffer.previousElementSibling === wrapper ? buffer : wrapper;
+    const placed = existing && existing.previousElementSibling === anchor;
     if (placed && sig === lastSig) return;
     const fresh = build();
     if (existing) existing.remove();
-    wrapper.parentElement.insertBefore(fresh, wrapper);
+    anchor.after(fresh);
     lastSig = sig;
     refreshMenu();
   }

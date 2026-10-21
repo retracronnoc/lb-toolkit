@@ -79,3 +79,15 @@ test('a custom FI multiple overrides 1 ÷ rate but not the safe withdrawal', () 
   assert.equal(h.safeYearly, $(40000));
   assert.equal(R.horizon({ invested: 0, spending: $(60000), saving: 0, multiple: null }).fiNumber, $(1500000));
 });
+
+test('runway: how long the money lasts if you stopped today', () => {
+  const flat = R.runway({ invested: $(600000), spending: $(60000), growth: 0 });
+  assert.equal(flat.years, 10);
+  assert.equal(flat.days, 3652);
+  assert.equal(flat.grownYears, 10);
+  const grown = R.runway({ invested: $(600000), spending: $(60000), growth: 0.05 });
+  assert.ok(Math.abs(grown.grownYears - Math.log(60000 / 30000) / Math.log(1.05)) < 1e-9); // ≈ 14.2 yrs
+  assert.equal(R.runway({ invested: $(2000000), spending: $(60000), growth: 0.05 }).grownYears, null); // growth covers it
+  assert.equal(R.runway({ invested: $(100), spending: 0 }).days, null);
+  assert.equal(R.runway({ invested: -$(5), spending: $(100) }).days, 0);
+});

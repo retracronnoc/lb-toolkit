@@ -4,7 +4,7 @@ A Chrome extension that adds extra pages, widgets and tweaks to the [Liquid Budg
 
 > **Unofficial.** This project is not made, endorsed or supported by Liquid Budget. It only reads your data. It never changes your budget, and it only talks to liquidbudget.com.
 
-ALL SCREENSHOTS -> https://drive.google.com/drive/u/0/folders/1m69s8cT-dGbzdebYrvtFNxId0ntqKEhv
+![Pacing page](docs/screenshot-pacing.png)
 
 ## Features
 
@@ -15,7 +15,7 @@ ALL SCREENSHOTS -> https://drive.google.com/drive/u/0/folders/1m69s8cT-dGbzdebYr
 | **Pacing page** | Replaces Forecast in the left menu with a page about the current month. It counts every transaction dated this month, including pending and scheduled ones. It shows a verdict banner (Calm, On track, Watch, Faster than usual) comparing spending so far with your usual range by this day over the last 6 months. The cumulative spending chart shows that usual band and last month's line. The page also lists buckets projected to run out before month end, how each compares with its usual spend and how often it ran out recently, and everything still to come this month. |
 | **Quick assign suggestions** | At the bottom of Pacing. Compares each bucket's quick assign with what you actually spent over the last 6 or 12 months, and suggests raising, lowering or setting it. Each suggestion comes with a reason and a small bar chart of monthly spending. Savings buckets are never told to lower, and top-off or minimum quick assigns are only ever raised. Any suggestion can be hidden. |
 | **Days of Buffer** | A right-panel widget: how many days an account group (Liquid by default) would last at your average daily spending over the last 90, 180 or 360 days. It can optionally subtract credit card balances first. |
-| **Retirement Horizon** | A right-panel widget: progress to financial independence (FI). It shows your FI number (25× a year of spending at a 4% withdrawal rate), what a safe withdrawal pays a month and a year, your saving rate, and how many years until FI, both with your current saving and by growth alone. The cog sets the withdrawal rate, an optional custom FI multiple, growth after inflation, money saved outside the budget (such as 401(k) payroll contributions), the spending window, which account groups count as invested and which categories count as spending. |
+| **Retirement Horizon** | A right-panel widget: progress to financial independence (FI). It shows your FI number (25× a year of spending at a 4% withdrawal rate), what a safe withdrawal pays a month and a year, your saving rate, and how many years until FI, both with your current saving and by growth alone. An "If you stop working" section shows how long your money would last at current spending, in years, months and days, with and without growth. The cog sets the withdrawal rate, an optional custom FI multiple, growth after inflation, money saved outside the budget (such as 401(k) payroll contributions), the spending window, which account groups count as invested and which categories count as spending. |
 | **Future assigned months** | In All Money Assigned: one line per future month with money assigned. Each line shows the percentage of that month's quick assign goals already funded. |
 | **Available includes upcoming** | A calendar-clock toggle in the Available column header. While it's on, each bucket's Available has later-this-month transactions taken out. |
 | **Highlight budget errors** | Makes warning bars such as Budget Overdraft larger and tinted red. |
@@ -107,6 +107,13 @@ node --test tests/*.test.js
 
 The content scripts work on top of Liquid Budget's own markup. They add elements and data attributes rather than changing the app's React state. If the app's markup changes, a feature may quietly stop showing until it's updated.
 
+### Packaging for the Chrome Web Store
+
+Zip the folder contents (not the folder), leaving out tests and docs:
+
+```bash
+zip -r toolkit-for-liquid-budget.zip . -x 'tests/*' -x 'docs/*' -x '.git/*' -x '*.DS_Store' -x 'README.md'
+```
 
 ## Disclaimer
 

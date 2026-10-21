@@ -1,7 +1,7 @@
 /**
  * Toolkit for Liquid Budget — "Days of Buffer" widget on the budget screen.
  *
- * Adds a widget to the right-hand panel, above All Money Assigned: how many
+ * Adds a widget to the right-hand panel, below All Money Assigned: how many
  * days the balance of one account group (Liquid by default) would last at the
  * average daily spending of the last 90, 180 or 360 days (picked from the
  * widget's cog menu, like the app's own Overview widget). The same menu can
@@ -86,6 +86,31 @@
     const card = title && title.closest('div.border');
     return card && card.parentElement ? card.parentElement : null;
   }
+
+  // Where the Toolkit widgets go in the right panel: just below the panel's
+  // header and any cards the app puts first: All Money Assigned, Budget
+  // Errors, or a selected bucket's Bucket Warning. That way errors and
+  // warnings stay at the top.
+  function topCard() {
+    const ama = assignedWrapper();
+    // The right panel: All Money Assigned's parent, or (while a bucket is
+    // selected and that card is gone) wherever the Toolkit widgets already are.
+    const own = document.getElementById('lbt-buffer-widget') || document.getElementById('lbt-retire-widget');
+    const panel = ama ? ama.parentElement : own ? own.parentElement : null;
+    if (!panel) return null;
+    let anchor = null;
+    for (const c of panel.children) {
+      if (c.id && c.id.startsWith('lbt-')) continue;
+      const header = !anchor && c.matches('div.flex.items-center.justify-between'); // "My Budget" / the bucket's name
+      const alert = c.matches('div.overflow-hidden.rounded-lg.border') &&
+        (/\bborder-(warning|destructive)/.test(String(c.className)) || /^(budget errors|bucket warning)/i.test(c.textContent.trim()));
+      if (header || c === ama || alert) anchor = c;
+      else break; // only the cards at the very top
+    }
+    return anchor || ama;
+  }
+
+
 
   function parseMoney(text) {
     const m = String(text).replace(/\s/g, '').match(/^(-)?\$?(-)?([\d,]+(?:\.\d+)?)$/);
@@ -364,7 +389,7 @@
   function sync() {
     const existing = document.getElementById(WIDGET_ID);
     const id = budgetIdFromPath();
-    const wrapper = enabled && id ? assignedWrapper() : null;
+    const wrapper = enabled && id ? topCard() : null;
     if (!wrapper) {
       if (existing && !enabled) existing.remove();
       return;
@@ -382,15 +407,13 @@
     const balance = groupBalance(group);
     const cards = includeCards ? groupBalance(cardsGroup) : null;
     const sig = [id, open, group, windowDays, balance, includeCards, cardsGroup, cards, state.fetchedAt, F.localToday(), state.error && state.error.message, state.loading].join('|');
-    // Sits just above Retirement Horizon when that's showing, else above All Money Assigned.
-    const retire = document.getElementById('lbt-retire-widget');
-    const anchor = retire && retire.nextElementSibling === wrapper ? retire : wrapper;
-    const placed = existing && existing.nextElementSibling === anchor;
+    // Just below All Money Assigned (or Budget Errors), above Retirement Horizon.
+    const placed = existing && existing.previousElementSibling === wrapper;
     if (placed && sig === lastSig) return;
     closeMenu();
     const fresh = build(balance, cards);
     if (existing) existing.remove();
-    anchor.parentElement.insertBefore(fresh, anchor);
+    wrapper.after(fresh);
     lastSig = sig;
   }
 
