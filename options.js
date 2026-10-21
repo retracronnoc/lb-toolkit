@@ -17,6 +17,8 @@ const DEFAULTS = {
   bufferIncludeCards: false,
   bufferCardsGroup: 'Credit Cards',
   retireWidget: true,
+  panelReorder: true,
+  panelPinAlerts: true,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -61,6 +63,13 @@ document.querySelectorAll('input[data-setting]').forEach((el) => {
     chrome.storage.sync.set({ [el.dataset.setting]: el.checked }, () => flash('Saved'));
   });
 });
+
+// Reset the right panel's card order (settings page only)
+if ($('resetPanelOrder')) {
+  $('resetPanelOrder').addEventListener('click', () => {
+    chrome.storage.sync.remove('panelOrder', () => flash('Panel order reset'));
+  });
+}
 
 // Token (settings page only)
 function setTokenStatus(kind, text) {

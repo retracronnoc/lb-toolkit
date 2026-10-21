@@ -233,6 +233,7 @@ nav[data-lbt-compact] > a { height: 2rem !important; padding-top: 0 !important; 
 /* The app's own amount stays in the DOM; the adjusted one is drawn over it. */
 [data-lbt-adj] { font-size: 0 !important; }
 [data-lbt-adj]::after { content: attr(data-lbt-adj); font-size: .875rem; line-height: 1.25rem; }
+[data-lbt-twinned] { display: none !important; }
 button[data-lbt-tone="neg"] { background-color: hsl(var(--destructive)) !important; color: hsl(var(--destructive-foreground, 0 0% 100%)) !important; border-color: transparent !important; }
 button[data-lbt-tone="zero"] { background-color: hsl(var(--background)) !important; color: hsl(var(--foreground)) !important; border: 1px solid hsl(var(--input, var(--border))) !important; }
 button[data-lbt-tone="pos"] { background-color: hsl(var(--success)) !important; color: hsl(var(--success-foreground, 0 0% 100%)) !important; border-color: transparent !important; }
@@ -352,3 +353,23 @@ main[data-lbt-cf-on] > :not(#lbt-cf-root) { display: none !important; }
 .lbt-rh-check input { width: 14px; height: 14px; margin: 0; accent-color: hsl(var(--primary)); flex-shrink: 0; }
 .lbt-rh-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lbt-rh-suf { width: 2.1rem; text-align: left; }
+
+/* ---------- Rearrange the right panel (panel-ui.js) ---------- */
+/* The panel becomes a flex column; each card's CSS order sets where it shows.
+   Margins are replaced by a gap, matching the app's 1rem between cards. */
+[data-lbt-panel] { flex-direction: column; row-gap: 1rem; padding-bottom: 1rem; }
+[data-lbt-panel] > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+[data-lbt-panel] > :first-child { margin-top: .25rem !important; }
+[data-lbt-panel] > * > div.border { margin-bottom: 0 !important; }
+[data-lbt-card] { position: relative; }
+[data-lbt-grip] {
+  position: absolute; left: 2px; top: 10px; z-index: 11; width: 12px; height: 16px; padding: 0; border: 0; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center; background: transparent; color: hsl(var(--muted-foreground));
+  cursor: grab; opacity: 0; touch-action: none; transition: opacity .12s;
+}
+[data-lbt-card]:hover > [data-lbt-grip], [data-lbt-grip]:focus-visible { opacity: .85; }
+[data-lbt-grip]:hover { opacity: 1; background: hsl(var(--muted)); color: hsl(var(--foreground)); }
+[data-lbt-grip]:focus-visible { outline: 2px solid hsl(var(--ring, var(--primary))); outline-offset: 1px; }
+[data-lbt-dragging] { opacity: .45; }
+[data-lbt-dragging] > [data-lbt-grip] { cursor: grabbing; opacity: 1; }
+[data-lbt-drop-line] { position: fixed; z-index: 9999; height: 3px; border-radius: 2px; background: hsl(var(--primary)); pointer-events: none; box-shadow: 0 0 0 2px hsl(var(--background)); }

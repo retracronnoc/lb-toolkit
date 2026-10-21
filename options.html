@@ -50,6 +50,13 @@
   <label><input type="checkbox" data-setting="cashFlowTab" /> Reports: Cash Flow tab</label>
   <p class="hint">Adds a Cash Flow tab after Income vs Expense: a Sankey chart of the month from income sources through your budget to categories and buckets, with pending and scheduled amounts striped.</p>
 
+  <h2>Right panel</h2>
+  <label><input type="checkbox" data-setting="panelReorder" /> Rearrange the right panel's cards</label>
+  <p class="hint">Hover a card's header (All Money Assigned, Days of Buffer, Overview, History…) and drag the grip at its left to move it, or focus the grip and use the up and down arrow keys. The order is kept separately for the budget view and for a selected bucket.</p>
+  <label><input type="checkbox" data-setting="panelPinAlerts" /> Keep Budget Errors and Bucket Warning at the top</label>
+  <div class="row"><button type="button" id="resetPanelOrder">Reset panel order</button></div>
+  <p class="hint block">Puts the cards back in Liquid Budget's own order.</p>
+
   <h2>Days of Buffer</h2>
   <label><input type="checkbox" data-setting="bufferWidget" /> Show Days of Buffer on the budget screen</label>
   <p class="hint">A widget below All Money Assigned: how many days your account group's balance would last at the last 90 days' spending.</p>

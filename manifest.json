@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Toolkit for Liquid Budget (Unofficial)",
-  "version": "0.15.3",
+  "version": "0.16.1",
   "description": "Unofficial add-ons for Liquid Budget: a Pacing page, Days of Buffer, Retirement Horizon, upcoming-aware Available and more.",
   "permissions": [
     "storage"
@@ -38,6 +38,7 @@
         "pacing-ui.js",
         "buffer-ui.js",
         "retire-ui.js",
+        "panel-ui.js",
         "avail-ui.js",
         "future-ui.js",
         "reports-ui.js",

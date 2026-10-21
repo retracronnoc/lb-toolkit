@@ -142,12 +142,39 @@
 
   const tone = (v) => (v < -50 ? 'neg' : v > 50 ? 'pos' : 'zero');
 
+  function unmark(el) {
+    el.removeAttribute('data-lbt-adj');
+    el.removeAttribute('data-lbt-tone');
+    el.removeAttribute('data-lbt-twinned');
+    const twin = el.nextElementSibling;
+    if (twin && twin.hasAttribute('data-lbt-twin')) twin.remove();
+  }
+
   function clearAll() {
-    document.querySelectorAll('[data-lbt-adj]').forEach((el) => {
-      el.removeAttribute('data-lbt-adj');
-      el.removeAttribute('data-lbt-tone');
-    });
+    document.querySelectorAll('[data-lbt-adj]').forEach(unmark);
+    document.querySelectorAll('[data-lbt-twin]').forEach((el) => el.remove());
     document.querySelectorAll('[data-lbt-sched-icon]').forEach((el) => el.remove());
+  }
+
+  // Category totals hold their number as the div's own text, which a browser
+  // minimum font size can keep visible under the font-size:0 overlay. So those
+  // get a copy of the div showing the adjusted amount, with the app's own
+  // div hidden (it stays in the page for the app to update).
+  function twinFor(target, text, t) {
+    target.setAttribute('data-lbt-twinned', '');
+    const cell = target.parentElement;
+    let twin = target.nextElementSibling && target.nextElementSibling.hasAttribute('data-lbt-twin') ? target.nextElementSibling : null;
+    if (cell) cell.querySelectorAll(':scope > [data-lbt-twin]').forEach((x) => { if (x !== twin) x.remove(); });
+    if (!twin) {
+      twin = target.cloneNode(false);
+      for (const a of ['data-lbt-adj', 'data-lbt-tone', 'data-lbt-twinned']) twin.removeAttribute(a);
+      twin.setAttribute('data-lbt-twin', '');
+      target.after(twin);
+    }
+    if (twin.className !== target.className) twin.className = target.className;
+    if (twin.textContent !== text) twin.textContent = text;
+    if (t) twin.setAttribute('data-lbt-tone', t);
+    else twin.removeAttribute('data-lbt-tone');
   }
 
   function iconFor(entry, label) {
@@ -174,7 +201,9 @@
     const text = cur ? cur.strip(fmt(adj)) : fmt(adj);
     if (target.getAttribute('data-lbt-adj') !== text) target.setAttribute('data-lbt-adj', text);
     const t = tone(adj);
-    if (t !== tone(shown)) target.setAttribute('data-lbt-tone', t);
+    if (target.tagName !== 'BUTTON') {
+      twinFor(target, text, t !== tone(shown) ? t : null);
+    } else if (t !== tone(shown)) target.setAttribute('data-lbt-tone', t);
     else target.removeAttribute('data-lbt-tone');
     let icon = cell.querySelector(':scope > [data-lbt-sched-icon]');
     if (!withIcon) {
@@ -292,11 +321,15 @@
     // Drop marks from rows that no longer have upcoming transactions.
     document.querySelectorAll('[data-lbt-adj]').forEach((el) => {
       if (seen.has(el)) return;
-      el.removeAttribute('data-lbt-adj');
-      el.removeAttribute('data-lbt-tone');
+      unmark(el);
       const cell = el.closest('td');
       const icon = cell && cell.querySelector(':scope > [data-lbt-sched-icon]');
       if (icon) icon.remove();
+    });
+    // Copies left behind when the app re-drew a total.
+    document.querySelectorAll('[data-lbt-twin]').forEach((tw) => {
+      const prev = tw.previousElementSibling;
+      if (!prev || !prev.hasAttribute('data-lbt-twinned')) tw.remove();
     });
   }
 

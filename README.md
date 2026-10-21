@@ -18,6 +18,7 @@ A Chrome extension that adds extra pages, widgets and tweaks to the [Liquid Budg
 | **Retirement Horizon** | A right-panel widget: progress to financial independence (FI). It shows your FI number (25× a year of spending at a 4% withdrawal rate), what a safe withdrawal pays a month and a year, your saving rate, and how many years until FI, both with your current saving and by growth alone. An "If you stop working" section shows how long your money would last at current spending, in years, months and days, with and without growth. The cog sets the withdrawal rate, an optional custom FI multiple, growth after inflation, money saved outside the budget (such as 401(k) payroll contributions), the spending window, which account groups count as invested and which categories count as spending. |
 | **Future assigned months** | In All Money Assigned: one line per future month with money assigned. Each line shows the percentage of that month's quick assign goals already funded. |
 | **Available includes upcoming** | A calendar-clock toggle in the Available column header. While it's on, each bucket's Available has later-this-month transactions taken out. |
+| **Rearrange right panel** | Hover a right-panel card's header and drag the grip at its left to move the card, or focus the grip and use the arrow keys. Works for All Money Assigned, Overview, History and the Toolkit widgets. The order is saved separately for the budget view and for a selected bucket. Budget Errors and Bucket Warning stay pinned at the top (a setting), and **Reset panel order** in settings puts the cards back. |
 | **Highlight budget errors** | Makes warning bars such as Budget Overdraft larger and tinted red. |
 
 ### Reports
@@ -107,6 +108,13 @@ node --test tests/*.test.js
 
 The content scripts work on top of Liquid Budget's own markup. They add elements and data attributes rather than changing the app's React state. If the app's markup changes, a feature may quietly stop showing until it's updated.
 
+### Packaging for the Chrome Web Store
+
+Zip the folder contents (not the folder), leaving out tests and docs:
+
+```bash
+zip -r toolkit-for-liquid-budget.zip . -x 'tests/*' -x 'docs/*' -x '.git/*' -x '*.DS_Store' -x 'README.md'
+```
 
 ## Disclaimer
 
